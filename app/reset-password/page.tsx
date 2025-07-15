@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import type { Session, AuthChangeEvent } from "@supabase/supabase-js"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
@@ -44,7 +45,7 @@ export default function ResetPasswordPage() {
     setIsPageLoading(true)
 
     // Bước 1: Lấy session nếu có từ hash URL
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
       if (session) {
         setIsValidSession(true)
         setMessage("Bạn có thể đặt mật khẩu mới.")
@@ -55,7 +56,7 @@ export default function ResetPasswordPage() {
     // Bước 2: Theo dõi sự kiện xác thực từ Supabase
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       if (event === "PASSWORD_RECOVERY" && session) {
         setIsValidSession(true)
         setMessage("Bạn có thể đặt mật khẩu mới.")
@@ -72,7 +73,7 @@ export default function ResetPasswordPage() {
       const refresh = params.get("refresh_token")
 
       if (token && refresh) {
-        supabase.auth.setSession({ access_token: token, refresh_token: refresh }).then(({ error }) => {
+        supabase.auth.setSession({ access_token: token, refresh_token: refresh }).then(({ error }: { error: any }) => {
           if (!error) {
             setIsValidSession(true)
             setMessage("Bạn có thể đặt lại mật khẩu.")
